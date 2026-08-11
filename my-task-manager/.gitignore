@@ -1,1 +1,4 @@
-__pycache__/echo *.pycecho .vscode/echo data/tasks.json
+__pycache__/
+*.pyc
+.vscode/
+data/tasks.json
