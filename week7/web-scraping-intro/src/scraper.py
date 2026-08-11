@@ -2,10 +2,16 @@ import requests
 from bs4 import BeautifulSoup
 
 class SimpleWebScraper:
+    """
+    A class to encapsulate basic web scraping functionality.
+    """
     def __init__(self, target_url):
         self.target_url = target_url
 
     def _get_html_content(self):
+        """
+        Downloads the HTML content from the target URL.
+        """
         print(f"Downloading content from: {self.target_url}")
         try:
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
@@ -18,18 +24,32 @@ class SimpleWebScraper:
             return None
 
     def scrape_main_titles(self):
+        """
+        Scrapes the main book title and chapter titles from the homepage.
+        """
         html_content = self._get_html_content()
         if not html_content:
             return None
+
         soup = BeautifulSoup(html_content, 'html.parser')
-        book_title_tag = soup.find('div', class_='page-header')
-        book_title = book_title_tag.find('h1').get_text(strip=True) if book_title_tag and book_title_tag.find('h1') else "Book Title Not Found"
-        refined_chapter_titles = []
-        toctree_wrapper = soup.find('div', class_='toctree-wrapper')
-        if toctree_wrapper:
-            chapter_links = toctree_wrapper.select('li.toctree-l1 a.reference.internal')
-            for link in chapter_links:
-                title = link.get_text(strip=True)
-                if title:
-                    refined_chapter_titles.append(title)
-        return {"book_title": book_title, "chapter_titles": refined_chapter_titles}
+
+        # 1. ดึงชื่อหนังสือ (ค้นหาจาก tag h1 หรือ title)
+        h1_tag = soup.find('h1')
+        book_title = h1_tag.get_text(strip=True) if h1_tag else soup.title.string
+
+        # 2. ดึงรายชื่อบทเรียน (ค้นหาลิงก์ในหน้าสารบัญ)
+        chapter_titles = []
+        
+        # ค้นหาลิงก์บทเรียนตามโครงสร้างหน้าเว็บปัจจุบัน
+        links = soup.find_all('a')
+        for link in links:
+            text = link.get_text(strip=True)
+            # กรองเฉพาะลิงก์ที่มีคำว่า Chapter หรือ Part
+            if text and ('Chapter' in text or 'Part' in text):
+                if text not in chapter_titles:
+                    chapter_titles.append(text)
+
+        return {
+            "book_title": book_title,
+            "chapter_titles": chapter_titles
+        }
