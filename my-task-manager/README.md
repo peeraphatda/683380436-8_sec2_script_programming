@@ -1,0 +1,1 @@
+# My Simple Task Manager CLIecho.echo Command-line task manager application built with Python.echo.echo ## Featuresecho - Add tasksecho - List tasksecho - Complete tasksecho - Delete tasksecho - Auto-save to data/tasks.jsonecho.echo ## How to Runecho ```echo python main.pyecho ```
